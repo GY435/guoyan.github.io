@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>郭岩 - AI 训练师 | 个人主页</title>
+  <meta name="description" content="郭岩 - AI 训练师 | 专注于大语言模型训练与优化 | 个人作品集与联系方式" />
+  <meta property="og:title" content="郭岩 - AI 训练师" />
+  <meta property="og:description" content="AI 训练师 | 大语言模型 | 数据标注 | 模型优化" />
+  <meta name="theme-color" content="#1a1a2e" />
+
+  <!-- 字体 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ═══════════════════════════════════════
+       设计令牌 (Design Tokens)
+    ═══════════════════════════════════════ */
+    :root {
+      /* 颜色系统 */
+      --accent-color:   #FF6B6B;
+      --accent-light:   #FFE66D;
+      --accent-blue:    #4ECDC4;
+      --text-light:     #FFFFFF;
+      --text-muted:     rgba(255, 255, 255, 0.7);
+      --glass-bg:       rgba(255, 255, 255, 0.08);
+      --glass-border:   rgba(255, 255, 255, 0.15);
+      --shadow-lg:      0 8px 32px rgba(0, 0, 0, 0.3);
+      --shadow-xl:      0 20px 60px rgba(0, 0, 0, 0.4);
+
+      /* 圆角 */
+      --r-sm:   12px;
+      --r-md:   20px;
+      --r-lg:   32px;
+      --r-full: 9999px;
+
+      /* 过渡 */
+      --ease: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+      --t:    0.3s;
+      --t-lg: 0.5s;
+
+      /* 布局 */
+      --max-w: 540px;
+      --pad-x: 20px;
+    }
+
+    /* ═══════════════════════════════════════
+       重置 (Reset)
+    ═══════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    body {
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+      color: var(--text-light);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* 背景图片 */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url('assets/background.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      opacity: 0.35;
+      z-index: -2;
+      animation: bgZoom 20s ease-in-out infinite;
+    }
+
+    /* 背景遮罩 */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%);
+      z-index: -1;
+    }
+
+    @keyframes bgZoom {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.02); }
+    }
+
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+
+    /* ═══════════════════════════════════════
+       加载动画 (Loader)
+    ═══════════════════════════════════════ */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s var(--ease-smooth), visibility 0.5s var(--ease-smooth);
+    }
+
+    #loader.out { opacity: 0; visibility: hidden; }
+
+    .loader-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .ld {
+      display: flex;
+      gap: 8px;
+    }
+
+    .ld span {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent-color);
+      animation: ldp 1.2s var(--ease-smooth) infinite;
+      box-shadow: 0 0 10px rgba(255, 107, 107, 0.6);
+    }
+    .ld span:nth-child(2) { animation-delay: .2s; }
+    .ld span:nth-child(3) { animation-delay: .4s; }
+
+    @keyframes ldp {
+      0%,80%,100% { transform: scale(0.6); opacity: 0.4; }
+      40%          { transform: scale(1);   opacity: 1;   }
+    }
+
+    .loader-text {
+      font-size: 14px;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+    }
+
+    /* ═══════════════════════════════════════
+       页面包装器 (Page Wrapper)
+    ═══════════════════════════════════════ */
+    .wrap {
+      width: 100%;
+      max-width: var(--max-w);
+      padding: 60px var(--pad-x) 60px;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s var(--ease-smooth), transform 0.7s var(--ease-smooth);
+      position: relative;
+      z-index: 10;
+    }
+
+    .wrap.in { opacity: 1; transform: none; }
+
+    /* ═══════════════════════════════════════
+       个人资料头部 (Profile Header)
+    ═══════════════════════════════════════ */
+    .profile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding-bottom: 40px;
+      margin-bottom: 20px;
+    }
+
+    /* 头像 */
+    .av-ring {
+      position: relative;
+      margin-bottom: 24px;
+      animation: float 3s var(--ease-smooth) infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50%      { transform: translateY(-12px); }
+    }
+
+    .av {
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 40px rgba(255, 107, 107, 0.4), 0 0 80px rgba(78, 205, 196, 0.2);
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.3), rgba(78, 205, 196, 0.3));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.9);
+      letter-spacing: -0.5px;
+      user-select: none;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      transition: all var(--t-lg) var(--ease);
+    }
+
+    .av img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .av:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 50px rgba(255, 107, 107, 0.6), 0 0 100px rgba(78, 205, 196, 0.3);
+    }
+
+    .av-status {
+      position: absolute;
+      bottom: 8px; right: 8px;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--accent-light);
+      border: 3px solid rgba(0, 0, 0, 0.3);
+      box-shadow: 0 0 15px rgba(255, 230, 109, 0.8);
+      animation: pulse 2s var(--ease-smooth) infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 15px rgba(255, 230, 109, 0.8); }
+      50%      { box-shadow: 0 0 25px rgba(255, 230, 109, 1); }
+    }
+
+    /* 姓名 & 简介 */
+    .name {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text-light);
+      margin-bottom: 8px;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #FFFFFF 0%, #FFE66D 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .title-line {
+      font-family: 'Noto Serif SC', Georgia, serif;
+      font-style: italic;
+      font-size: 15px;
+      color: var(--accent-light);
+      margin-bottom: 16px;
+      letter-spacing: 0.5px;
+      font-weight: 500;
+      animation: slideIn 0.8s var(--ease-smooth) 0.2s both;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .bio {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.8;
+      max-width: 360px;
+      font-weight: 400;
+      animation: slideIn 0.8s var(--ease-smooth) 0.3s both;
+    }
+
+    /* ═══════════════════════════════════════
+       技能标签 (Skills)
+    ═══════════════════════════════════════ */
+    .skills-section {
+      margin-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      animation: slideIn 0.8s var(--ease-smooth) 0.4s both;
+    }
+
+    .skill-tag {
+      display: inline-block;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--r-full);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-light);
+      letter-spacing: 0.5px;
+      transition: all var(--t) var(--ease);
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+    }
+
+    .skill-tag:hover {
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.3), rgba(78, 205, 196, 0.3));
+      border-color: var(--accent-light);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+    }
+
+    /* ═══════════════════════════════════════
+       分段标签 (Section Label)
+    ═══════════════════════════════════════ */
+    .label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--accent-light);
+      margin-bottom: 16px;
+      padding-left: 2px;
+      margin-top: 8px;
+    }
+
+    /* ═══════════════════════════════════════
+       毛玻璃卡片 (Glassmorphism Cards)
+    ═══════════════════════════════════════ */
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .lc {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--r-md);
+      box-shadow: var(--shadow-lg);
+      cursor: pointer;
+      transition: all var(--t) var(--ease);
+      position: relative;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+      backdrop-filter: blur(10px);
+    }
+
+    .lc::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(78, 205, 196, 0.1));
+      opacity: 0;
+      transition: opacity var(--t) var(--ease);
+    }
+
+    .lc:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-xl);
+      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .lc:hover::before { opacity: 1; }
+
+    .lc:active { transform: translateY(-2px); }
+
+    /* 图标 */
+    .li {
+      width: 44px; height: 44px;
+      border-radius: var(--r-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all var(--t) var(--ease);
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.3), rgba(78, 205, 196, 0.2));
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    .lc:hover .li {
+      transform: scale(1.1) rotate(5deg);
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.5), rgba(78, 205, 196, 0.4));
+      box-shadow: 0 0 20px rgba(255, 107, 107, 0.4);
+    }
+
+    .li svg { width: 20px; height: 20px; }
+
+    /* 文本 */
+    .lt { flex: 1; min-width: 0; }
+
+    .ln {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-light);
+      letter-spacing: -0.1px;
+      line-height: 1.3;
+    }
+
+    .ld2 {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 箭头 */
+    .la {
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition: all var(--t) var(--ease);
+    }
+
+    .lc:hover .la {
+      transform: translateX(4px) rotate(45deg);
+      color: var(--accent-light);
+    }
+
+    /* 涟漪效果 */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(0);
+      animation: rpl 0.6s var(--ease-smooth) forwards;
+      pointer-events: none;
+    }
+
+    @keyframes rpl {
+      to {
+        transform: scale(3);
+        opacity: 0;
+      }
+    }
+
+    /* ═══════════════════════════════════════
+       经验卡片 (Experience Cards)
+    ═══════════════════════════════════════ */
+    .exp-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .exp-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--r-md);
+      padding: 18px;
+      transition: all var(--t) var(--ease);
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .exp-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(78, 205, 196, 0.1));
+      opacity: 0;
+      transition: opacity var(--t) var(--ease);
+    }
+
+    .exp-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-xl);
+      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .exp-card:hover::before { opacity: 1; }
+
+    .exp-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-light);
+      margin-bottom: 6px;
+    }
+
+    .exp-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+
+    .exp-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .exp-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: var(--r-sm);
+      font-size: 11px;
+      color: var(--accent-light);
+      letter-spacing: 0.3px;
+      border: 1px solid rgba(255, 230, 109, 0.3);
+      transition: all var(--t) var(--ease);
+    }
+
+    .exp-tag:hover {
+      background: rgba(255, 230, 109, 0.2);
+      border-color: var(--accent-light);
+    }
+
+    /* ═══════════════════════════════════════
+       分割线 (Divider)
+    ═══════════════════════════════════════ */
+    .hr {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      margin: 0 0 32px;
+    }
+
+    /* ═══════════════════════════════════════
+       页脚 (Footer)
+    ═══════════════════════════════════════ */
+    .footer {
+      text-align: center;
+      padding-bottom: 12px;
+    }
+
+    .fsig {
+      font-family: 'Noto Serif SC', Georgia, serif;
+      font-style: italic;
+      font-size: 15px;
+      color: var(--accent-light);
+      margin-bottom: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    .fcopy {
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.4px;
+    }
+
+    /* ═══════════════════════════════════════
+       淡入动画 (Fade Animation)
+    ═══════════════════════════════════════ */
+    .fade {
+      opacity: 0;
+      transform: translateY(15px);
+      transition: opacity 0.5s var(--ease-smooth), transform 0.5s var(--ease-smooth);
+    }
+
+    .fade.in { opacity: 1; transform: none; }
+
+    /* ═══════════════════════════════════════
+       响应式 (Responsive)
+    ═══════════════════════════════════════ */
+    @media (max-width: 390px) {
+      :root { --pad-x: 14px; }
+      .name { font-size: 28px; }
+      .av { width: 95px; height: 95px; }
+    }
+
+    @media (min-width: 600px) {
+      .wrap { padding-top: 80px; padding-bottom: 80px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 加载动画 -->
+  <div id="loader">
+    <div class="loader-container">
+      <div class="ld">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="loader-text">加载中...</div>
+    </div>
+  </div>
+
+  <!-- 主内容 -->
+  <main class="wrap" id="main">
+
+    <!-- 个人资料 -->
+    <section class="profile">
+      <div class="av-ring">
+        <img class="av" src="assets/avatar.jpg" alt="郭岩" />
+        <span class="av-status" title="求职中"></span>
+      </div>
+
+      <h1 class="name">郭岩</h1>
+      <p class="title-line">AI 训练师 · 数据标注专家</p>
+      <p class="bio">
+        专注于大语言模型训练与优化，具有丰富的数据标注、模型评估和提示词工程经验。致力于为 AI 模型提供高质量的训练数据。
+      </p>
+
+      <!-- 技能标签 -->
+      <div class="skills-section">
+        <span class="skill-tag">LLM 训练</span>
+        <span class="skill-tag">数据标注</span>
+        <span class="skill-tag">提示词工程</span>
+        <span class="skill-tag">模型评估</span>
+        <span class="skill-tag">质量控制</span>
+      </div>
+    </section>
+
+    <!-- 联系方式 -->
+    <p class="label fade">联系我</p>
+    <div class="links">
+
+      <a class="lc fade" href="mailto:guoyan@example.com">
+        <div class="li">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="3"/>
+            <path d="M2 7l10 7 10-7"/>
+          </svg>
+        </div>
+        <div class="lt">
+          <div class="ln">邮箱</div>
+          <div class="ld2">guoyan@example.com</div>
+        </div>
+        <svg class="la" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+
+      <a class="lc fade" href="https://weibo.com/u/guoyan" target="_blank" rel="noopener noreferrer">
+        <div class="li">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10.05 8.95c-.5-.5-1.31-.5-1.81 0l-2.12 2.12c-.5.5-.5 1.31 0 1.81l1.06 1.06c.39.39.39 1.02 0 1.41-.39.39-1.02.39-1.41 0l-1.06-1.06c-1.27-1.27-1.27-3.34 0-4.61l2.12-2.12c1.27-1.27 3.34-1.27 4.61 0l1.06 1.06c.39.39.39 1.02 0 1.41-.39.39-1.02.39-1.41 0l-1.06-1.06zm3.9 3.9c.5.5 1.31.5 1.81 0l2.12-2.12c.5-.5.5-1.31 0-1.81l-1.06-1.06c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l1.06 1.06c1.27 1.27 1.27 3.34 0 4.61l-2.12 2.12c-1.27 1.27-3.34 1.27-4.61 0l-1.06-1.06c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l1.06 1.06z"/>
+          </svg>
+        </div>
+        <div class="lt">
+          <div class="ln">微博</div>
+          <div class="ld2">@郭岩</div>
+        </div>
+        <svg class="la" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+
+      <a class="lc fade" href="https://github.com/guoyan" target="_blank" rel="noopener noreferrer">
+        <div class="li">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+        </div>
+        <div class="lt">
+          <div class="ln">GitHub</div>
+          <div class="ld2">github.com/guoyan</div>
+        </div>
+        <svg class="la" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+
+      <a class="lc fade" href="resume.pdf" target="_blank" rel="noopener">
+        <div class="li">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </div>
+        <div class="lt">
+          <div class="ln">个人简历</div>
+          <div class="ld2">查看完整简历</div>
+        </div>
+        <svg class="la" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+
+      <a class="lc fade" href="https://linkedin.com/in/guoyan" target="_blank" rel="noopener noreferrer">
+        <div class="li">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
+            <circle cx="4" cy="4" r="2"/>
+          </svg>
+        </div>
+        <div class="lt">
+          <div class="ln">LinkedIn</div>
+          <div class="ld2">职业档案</div>
+        </div>
+        <svg class="la" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+
+    </div>
+
+    <!-- 核心能力 -->
+    <p class="label fade">核心能力</p>
+    <div class="exp-grid">
+
+      <div class="exp-card fade">
+        <div class="exp-title">🎯 LLM 训练与优化</div>
+        <div class="exp-desc">
+          3+ 年大语言模型训练经验，熟悉 RLHF、SFT、DPO 等训练方法，参与过多个百亿级参数模型的训练与优化。
+        </div>
+        <div class="exp-tags">
+          <span class="exp-tag">RLHF</span>
+          <span class="exp-tag">SFT</span>
+          <span class="exp-tag">模型评估</span>
+        </div>
+      </div>
+
+      <div class="exp-card fade">
+        <div class="exp-title">📊 高质量数据标注</div>
+        <div class="exp-desc">
+          管理过 100+ 标注员团队，建立完善的数据质量控制体系，标注准确率保持在 98% 以上。
+        </div>
+        <div class="exp-tags">
+          <span class="exp-tag">质量管理</span>
+          <span class="exp-tag">团队协作</span>
+          <span class="exp-tag">数据清洗</span>
+        </div>
+      </div>
+
+      <div class="exp-card fade">
+        <div class="exp-title">💡 提示词工程</div>
+        <div class="exp-desc">
+          深入研究提示词设计与优化，开发了系统的提示词工程框架，显著提升了模型输出质量。
+        </div>
+        <div class="exp-tags">
+          <span class="exp-tag">Prompt Design</span>
+          <span class="exp-tag">Chain-of-Thought</span>
+          <span class="exp-tag">Few-shot Learning</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 页脚 -->
+    <div class="hr"></div>
+    <footer class="footer fade">
+      <p class="fsig">用心打磨每一个数据点。</p>
+      <p class="fcopy">© 2024 郭岩 · 保留所有权利</p>
+    </footer>
+
+  </main>
+
+  <script>
+    /* 加载动画 → 显示 */
+    function reveal() {
+      document.getElementById('loader').classList.add('out');
+      const main = document.getElementById('main');
+      main.classList.add('in');
+
+      /* 卡片逐一淡入 */
+      const items = main.querySelectorAll('.fade');
+      items.forEach((el, i) => {
+        setTimeout(() => el.classList.add('in'), 100 + i * 70);
+      });
+    }
+
+    if (document.readyState === 'complete') {
+      setTimeout(reveal, 500);
+    } else {
+      window.addEventListener('load', () => setTimeout(reveal, 500));
+    }
+
+    /* 链接卡片涟漪效果 */
+    document.querySelectorAll('.lc').forEach(card => {
+      card.addEventListener('pointerdown', function(e) {
+        const r   = this.getBoundingClientRect();
+        const sz  = Math.max(r.width, r.height);
+        const el  = document.createElement('span');
+        el.className = 'ripple';
+        Object.assign(el.style, {
+          width:  sz + 'px',
+          height: sz + 'px',
+          left:   (e.clientX - r.left  - sz / 2) + 'px',
+          top:    (e.clientY - r.top   - sz / 2) + 'px',
+        });
+        this.appendChild(el);
+        setTimeout(() => el.remove(), 600);
+      });
+    });
+
+    /* 交叉观察器（滚动显示） */
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade').forEach(el => io.observe(el));
+
+    /* 鼠标移动视差效果 */
+    document.addEventListener('mousemove', (e) => {
+      const profile = document.querySelector('.profile');
+      if (!profile) return;
+
+      const x = (e.clientX / window.innerWidth - 0.5) * 20;
+      const y = (e.clientY / window.innerHeight - 0.5) * 20;
+
+      profile.style.transform = `perspective(1000px) rotateX(${y * 0.5}deg) rotateY(${x * 0.5}deg)`;
+    });
+
+    document.addEventListener('mouseleave', () => {
+      const profile = document.querySelector('.profile');
+      if (profile) profile.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+    });
+  </script>
+</body>
+</html>
